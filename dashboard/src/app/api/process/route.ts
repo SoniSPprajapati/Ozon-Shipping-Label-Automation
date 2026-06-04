@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
        }
        return NextResponse.json({ 
           labelCount: result.labelCount,
-          thermalPdfPath: `/outputs/thermal_labels_${timestamp}.pdf` // Return relative public URL instead of absolute path
+          thermalPdfPath: `/api/download?f=thermal_labels_${timestamp}.pdf` // Stream from API instead of strict static route
        });
     } catch (parseError) {
        console.error("Parse Error. Script stdout:", stdout);
