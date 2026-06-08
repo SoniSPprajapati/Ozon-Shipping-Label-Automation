@@ -47,11 +47,23 @@ export async function POST(req: NextRequest) {
 
     const { stdout, stderr } = await execAsync(cmd, { cwd: pipelineDir });
     
-    // Attempt to parse JSON response from the wrapper wrapper
+    // Attempt to parse JSON response from the wrapper
     const outputLines = stdout.trim().split('\n');
-    const jsonOutput = outputLines[outputLines.length - 1]; // Assume JSON is the last line printed
-    
     try {
+       // Find the line that looks like the JSON result
+       const jsonOutput = outputLines.find(line => {
+         try {
+           const parsed = JSON.parse(line.trim());
+           return parsed && typeof parsed === 'object' && 'success' in parsed;
+         } catch {
+           return false;
+         }
+       });
+
+       if (!jsonOutput) {
+         throw new Error("No valid JSON output found from processing engine.");
+       }
+
        const result = JSON.parse(jsonOutput);
        if (!result.success) {
           throw new Error(result.error || 'Failed at pipeline processing');

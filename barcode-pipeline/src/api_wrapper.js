@@ -82,7 +82,12 @@ async function processPipeline(labelPdfPath, productPdfPath, outputPdfPath) {
     }));
 
   } catch (error) {
-    console.log(JSON.stringify({ success: false, error: error.message }));
+    console.error("Pipeline Error:", error);
+    console.log(JSON.stringify({ 
+      success: false, 
+      error: error.message,
+      stack: error.stack 
+    }));
     process.exit(1);
   }
 }

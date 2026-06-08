@@ -110,8 +110,8 @@ Do NOT return anything else, only the raw JSON array.`
       }
       return textsArray.map(t => translationMap.get(t) || t);
 
-   } catch (e) {
-      console.warn(`\n⚠️ Bulk translation error: Falling back to original texts.`);
-      return textsArray;
-   }
+    } catch (e) {
+       // Silent fallback to avoid polluting stderr and breaking dashboard wrappers
+       return textsArray;
+    }
 }
