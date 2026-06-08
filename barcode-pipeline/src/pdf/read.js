@@ -1,7 +1,10 @@
 import fs from 'fs';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
-const pdf = require('pdf-parse');
+let pdf = require('pdf-parse');
+if (typeof pdf !== 'function' && pdf.default) {
+  pdf = pdf.default;
+}
 
 export async function readPdf(filePath) {
   try {
