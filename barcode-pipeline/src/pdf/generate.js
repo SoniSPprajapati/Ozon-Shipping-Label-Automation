@@ -61,7 +61,7 @@ export async function createThermalPDFWithDetails(originalLabelBytes, pagesData,
         let titleString = (product.title || 'Unknown Title')
           .replace(/SKU|Article/gi, '')
           .trim();
-        const cleanTitle = titleString.replace(/[^\x00-\x7FА-Яа-яЁё]/g, '').trim();
+        const cleanTitle = titleString.replace(/[^\x00-\x7F]/g, '').trim() || "Item";
         // At font-size 9, ~48 chars fit in the label width
         const titleLines = wrapText(`Title: ${cleanTitle}`, 48);
         wrappedProducts.push({ product, titleLines });
