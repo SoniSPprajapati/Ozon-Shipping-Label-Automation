@@ -1,10 +1,8 @@
 import fs from 'fs';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
-let pdf = require('pdf-parse');
-if (typeof pdf !== 'function' && pdf.default) {
-  pdf = pdf.default;
-}
+// Direct require of the logic file to bypass buggy ESM wrappers in Bun/Linux
+const pdf = require('pdf-parse/lib/pdf-parse.js');
 
 export async function readPdf(filePath) {
   try {
