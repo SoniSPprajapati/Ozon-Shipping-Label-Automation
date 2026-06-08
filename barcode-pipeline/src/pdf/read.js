@@ -1,8 +1,5 @@
 import fs from 'fs';
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-// Direct require of the logic file to bypass buggy ESM wrappers in Bun/Linux
-const pdf = require('pdf-parse/lib/pdf-parse.js');
+import { PDFParse } from 'pdf-parse';
 
 export async function readPdf(filePath) {
   try {
@@ -10,8 +7,10 @@ export async function readPdf(filePath) {
       throw new Error('File does not exist');
     }
     const dataBuffer = fs.readFileSync(filePath);
-    const data = await pdf(dataBuffer);
-    return data.text;
+    const parser = new PDFParse({ data: dataBuffer });
+    const result = await parser.getText();
+    await parser.destroy();
+    return result.text;
   } catch (error) {
     throw new Error(`Failed to read PDF: ${error.message}`);
   }
@@ -23,13 +22,14 @@ export async function readPdfPages(filePath) {
       throw new Error('File does not exist');
     }
     const dataBuffer = fs.readFileSync(filePath);
+    const parser = new PDFParse({ data: dataBuffer });
     
-    // For standard Ozon shipping labels, we need to extract IDs page by page.
-    // pdf-parse doesn't do this easily in one call, but we can return the full text
-    // as a single-element array if needed, though the pipeline expects per-page text.
-    // However, to fix the immediate crash caused by the non-existent PDFParse class:
-    const data = await pdf(dataBuffer);
-    return [data.text]; 
+    // getText with default params returns Result which includes pages array
+    const result = await parser.getText();
+    const pagesText = result.pages.map(p => p.text);
+    
+    await parser.destroy();
+    return pagesText;
   } catch (error) {
     throw new Error(`Failed to read PDF text: ${error.message}`);
   }
